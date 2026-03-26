@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(du -sh /c/laragon/www/ecommerce-app/*)",
+      "Bash(find /c/laragon/www/ecommerce-app/backend/app/Http/Controllers -type f -name *.php)",
+      "Bash(find /c/laragon/www/ecommerce-app/backend/database/migrations -type f -name *.php)",
+      "Bash(composer require:*)",
+      "Bash(php artisan:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(pkill -f \"php artisan serve\")"
+    ]
+  }
+}
