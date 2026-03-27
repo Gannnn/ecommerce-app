@@ -377,4 +377,51 @@ function initials(name: string): string {
   text-align: right;
   flex-shrink: 0;
 }
+
+@media (max-width: 767px) {
+  .hero-inner {
+    padding: 0 20px;
+  }
+
+  .page-body {
+    padding: 28px 20px 80px;
+  }
+
+  .profile-card {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .sign-out-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+
+  .order-header-right {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .order-items {
+    padding: 4px 16px;
+  }
+
+  .item-image {
+    width: 52px;
+    height: 52px;
+  }
+
+  .item-qty,
+  .item-price {
+    font-size: 0.8125rem;
+  }
+}
 </style>

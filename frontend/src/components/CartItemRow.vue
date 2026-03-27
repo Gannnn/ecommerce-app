@@ -177,6 +177,53 @@ async function remove() {
   cursor: not-allowed;
 }
 
+@media (max-width: 767px) {
+  .cart-row {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    row-gap: 10px;
+    padding: 16px 0;
+  }
+
+  .cart-image {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    width: 72px;
+    height: 72px;
+    align-self: center;
+  }
+
+  .cart-details {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .remove-btn {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+    margin-top: 2px;
+  }
+
+  .qty-stepper {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    width: fit-content;
+  }
+
+  .cart-subtotal {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: center;
+    width: auto;
+    text-align: right;
+  }
+}
+
 .qty-stepper.is-updating {
   min-width: 80px;
   justify-content: center;

@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 
 const auth = useAuthStore()
 const cart = useCartStore()
+const route = useRoute()
+const mobileMenuOpen = ref(false)
+
+watch(() => route.path, () => { mobileMenuOpen.value = false })
 
 const categories = [
   { label: 'Mac',         slug: 'mac' },
@@ -41,7 +47,14 @@ const categories = [
 
       <!-- Right icons -->
       <div class="nav-actions">
-        <RouterLink to="/cart" class="nav-action cart-action" aria-label="Shopping cart">
+        <!-- Hamburger (mobile only) -->
+        <button class="hamburger nav-action" aria-label="Menu" @click="mobileMenuOpen = !mobileMenuOpen">
+          <span class="ham-bar" :class="{ open: mobileMenuOpen }" />
+          <span class="ham-bar" :class="{ open: mobileMenuOpen }" />
+          <span class="ham-bar" :class="{ open: mobileMenuOpen }" />
+        </button>
+
+        <RouterLink to="/cart" class="nav-action cart-action desktop-only" aria-label="Shopping cart">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
             <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.71L23 6H6" />
@@ -50,14 +63,14 @@ const categories = [
         </RouterLink>
 
         <template v-if="auth.isAuthenticated">
-          <RouterLink to="/account" class="nav-action" aria-label="Account">
+          <RouterLink to="/account" class="nav-action desktop-only" aria-label="Account">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
             </svg>
           </RouterLink>
         </template>
         <template v-else>
-          <RouterLink to="/login" class="nav-action" aria-label="Sign in">
+          <RouterLink to="/login" class="nav-action desktop-only" aria-label="Sign in">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
             </svg>
@@ -66,6 +79,42 @@ const categories = [
       </div>
     </nav>
   </header>
+
+  <!-- Mobile menu -->
+  <Transition name="mobile-menu">
+    <div v-if="mobileMenuOpen" class="mobile-menu">
+      <RouterLink to="/" class="mobile-item" @click="mobileMenuOpen = false">Store</RouterLink>
+      <RouterLink
+        v-for="cat in categories"
+        :key="cat.slug"
+        :to="`/?category=${cat.slug}`"
+        class="mobile-item"
+        @click="mobileMenuOpen = false"
+      >{{ cat.label }}</RouterLink>
+      <div class="mobile-divider" />
+      <RouterLink to="/cart" class="mobile-item mobile-item-icon" @click="mobileMenuOpen = false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+          <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.71L23 6H6" />
+        </svg>
+        Cart
+        <span v-if="cart.itemCount > 0" class="mobile-cart-count">{{ cart.itemCount }}</span>
+      </RouterLink>
+      <RouterLink v-if="auth.isAuthenticated" to="/account" class="mobile-item mobile-item-icon" @click="mobileMenuOpen = false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
+        </svg>
+        Account
+      </RouterLink>
+      <RouterLink v-else to="/login" class="mobile-item mobile-item-icon" @click="mobileMenuOpen = false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
+        </svg>
+        Sign In
+      </RouterLink>
+      <RouterLink v-if="auth.isAdmin" to="/admin" class="mobile-item mobile-item-muted" @click="mobileMenuOpen = false">Admin</RouterLink>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
@@ -180,5 +229,99 @@ const categories = [
   align-items: center;
   justify-content: center;
   padding: 0 3px;
+}
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+}
+
+.ham-bar {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: center;
+}
+
+/* Animate to X when open */
+.ham-bar:nth-child(1).open { transform: translateY(6.5px) rotate(45deg); }
+.ham-bar:nth-child(2).open { opacity: 0; }
+.ham-bar:nth-child(3).open { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* Mobile dropdown menu */
+.mobile-menu {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid #d2d2d7;
+  z-index: 99;
+  padding: 8px 0 16px;
+}
+
+.mobile-item {
+  display: block;
+  padding: 12px 24px;
+  font-size: 1rem;
+  color: #1d1d1f;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.mobile-item:hover { background: #f5f5f7; }
+
+.mobile-item-muted { color: #6e6e73; font-size: 0.9375rem; }
+
+.mobile-divider {
+  height: 1px;
+  background: #d2d2d7;
+  margin: 8px 0;
+}
+
+.mobile-menu-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+.mobile-menu-leave-active { transition: opacity 0.14s ease, transform 0.14s ease; }
+.mobile-menu-enter-from  { opacity: 0; transform: translateY(-8px); }
+.mobile-menu-leave-to    { opacity: 0; transform: translateY(-4px); }
+
+.mobile-item-icon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-cart-count {
+  margin-left: auto;
+  background: #0071e3;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+@media (max-width: 767px) {
+  .nav-categories { display: none; }
+  .desktop-only { display: none; }
+  .hamburger { display: flex; }
+
+  .nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 </style>

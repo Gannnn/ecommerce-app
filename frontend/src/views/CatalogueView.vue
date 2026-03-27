@@ -149,6 +149,11 @@ const pageTitle = computed(() => {
       </div>
     </div>
 
+    <!-- Mobile filter backdrop -->
+    <Transition name="backdrop">
+      <div v-if="filterOpen" class="filter-backdrop" @click="filterOpen = false" />
+    </Transition>
+
     <!-- Body: sidebar + grid -->
     <div class="body-layout" :class="{ 'filter-open': filterOpen }">
 
@@ -508,5 +513,82 @@ const pageTitle = computed(() => {
   padding: 80px 0;
   color: #6e6e73;
   font-size: 0.9375rem;
+}
+
+/* Mobile filter backdrop */
+.filter-backdrop {
+  display: none;
+}
+
+.backdrop-enter-active { transition: opacity 0.25s ease; }
+.backdrop-leave-active { transition: opacity 0.2s ease; }
+.backdrop-enter-from, .backdrop-leave-to { opacity: 0; }
+
+@media (max-width: 767px) {
+  .hero-inner,
+  .controls-inner {
+    padding: 0 20px;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .body-layout {
+    padding: 0 20px 60px;
+  }
+
+  /* Side drawer */
+  .filter-panel-wrap {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: none;
+    max-height: none;
+    opacity: 1;
+    overflow-y: auto;
+    background: #fff;
+    z-index: 90;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .filter-panel-wrap.is-open {
+    max-width: none;
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .filter-panel {
+    width: 100%;
+    padding: 24px 20px;
+    border-right: none;
+    position: static;
+  }
+
+  .filter-backdrop {
+    display: block;
+    position: fixed;
+    inset: 44px 0 0 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 89;
+  }
+
+  .grid-area {
+    padding: 20px 0 0;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

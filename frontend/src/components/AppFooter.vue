@@ -138,21 +138,29 @@ const links = [
   color: var(--apple-dark);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
+  .site-footer {
+    margin-top: 48px;
+  }
+
+  .footer-inner {
+    padding: 32px 20px 24px;
+  }
+
   .footer-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
+    gap: 28px 20px;
+    margin-bottom: 28px;
   }
 
   .footer-bottom {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
   }
-}
 
-@media (max-width: 480px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
+  .footer-legal-links {
+    gap: 12px;
   }
 }
 </style>

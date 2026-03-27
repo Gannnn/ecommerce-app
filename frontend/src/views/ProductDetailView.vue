@@ -336,4 +336,49 @@ function formatPrice(price: number): string {
 }
 
 .back-btn:hover { text-decoration: underline; }
+
+@media (max-width: 767px) {
+  .detail-page {
+    padding: 24px 20px 60px;
+  }
+
+  .breadcrumb {
+    margin-bottom: 24px;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .image-col {
+    position: static;
+  }
+
+  .image-wrap {
+    border-radius: 16px;
+    padding: 6%;
+  }
+
+  .info-col {
+    padding-top: 0;
+  }
+
+  .product-name {
+    font-size: 1.5rem;
+  }
+
+  .product-price {
+    font-size: 1.125rem;
+    margin-bottom: 20px;
+  }
+
+  .product-description {
+    margin-bottom: 20px;
+  }
+
+  .back-btn {
+    margin: 0;
+  }
+}
 </style>

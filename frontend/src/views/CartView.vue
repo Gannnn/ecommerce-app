@@ -335,17 +335,26 @@ async function placeOrder() {
   margin: 12px 0 0;
 }
 
-@media (max-width: 768px) {
-  .cart-layout {
-    grid-template-columns: 1fr;
+@media (max-width: 767px) {
+  .hero-inner {
+    padding: 0 20px;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
   }
 
   .page-body {
-    padding: 32px 24px 80px;
+    padding: 24px 20px 80px;
   }
 
-  .hero-inner {
-    padding: 0 24px;
+  .cart-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .summary-card {
+    position: static;
   }
 }
 </style>
