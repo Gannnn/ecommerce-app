@@ -20,9 +20,5 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
-  async function fetchProduct(id: number): Promise<Product> {
-    return productsService.getById(id)
-  }
-
-  return { products, loading, fetchProducts, fetchProduct }
+  return { products, loading, fetchProducts }
 })

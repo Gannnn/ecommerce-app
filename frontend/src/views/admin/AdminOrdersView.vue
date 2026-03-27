@@ -72,15 +72,20 @@ async function changeStatus(orderId: number, status: string) {
             <td class="td-meta">{{ formatPrice(order.total) }}</td>
             <td><OrderStatusBadge :status="order.status" /></td>
             <td>
-              <select
-                class="status-select"
-                :value="order.status"
-                @change="changeStatus(order.id, ($event.target as HTMLSelectElement).value)"
-              >
-                <option v-for="s in statuses" :key="s" :value="s">
-                  {{ s.charAt(0).toUpperCase() + s.slice(1) }}
-                </option>
-              </select>
+              <div class="select-wrap">
+                <select
+                  class="status-select"
+                  :value="order.status"
+                  @change="changeStatus(order.id, ($event.target as HTMLSelectElement).value)"
+                >
+                  <option v-for="s in statuses" :key="s" :value="s">
+                    {{ s.charAt(0).toUpperCase() + s.slice(1) }}
+                  </option>
+                </select>
+                <svg class="select-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -168,19 +173,36 @@ async function changeStatus(orderId: number, status: string) {
 
 .td-meta { font-size: 0.875rem; color: #6e6e73; }
 
+.select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
 .status-select {
-  border: 1px solid #d2d2d7;
+  appearance: none;
+  -webkit-appearance: none;
+  background: #f5f5f7;
+  border: none;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 7px 30px 7px 12px;
+  min-width: 130px;
   font-size: 0.8125rem;
   font-family: inherit;
   color: #1d1d1f;
-  background: #fff;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.15s;
+  transition: background 0.15s;
 }
 
-.status-select:focus { border-color: #0071e3; }
-.status-select:hover { border-color: #aeaeb2; }
+.status-select:hover { background: #ebebf0; }
+.status-select:focus { background: #ebebf0; }
+
+.select-chevron {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6e6e73;
+}
 </style>

@@ -101,10 +101,15 @@ function formatPrice(price: number): string {
 const modalTitle = computed(() => (editing.value ? 'Edit Product' : 'New Product'))
 
 onMounted(async () => {
-  ;[products.value, categories.value] = await Promise.all([
-    adminProductsService.getAll(),
-    adminCategoriesService.getAll(),
-  ])
+  loading.value = true
+  try {
+    ;[products.value, categories.value] = await Promise.all([
+      adminProductsService.getAll(),
+      adminCategoriesService.getAll(),
+    ])
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
@@ -155,7 +160,8 @@ onMounted(async () => {
             <td class="td-meta">{{ formatPrice(p.price) }}</td>
             <td class="td-meta">{{ p.stock_quantity }}</td>
             <td class="td-meta">
-              <span class="badge" :class="p.is_featured ? 'badge-blue' : 'badge-grey'">
+              <span class="feat-status" :class="p.is_featured ? 'feat-on' : 'feat-off'">
+                <span class="feat-dot" />
                 {{ p.is_featured ? 'Featured' : 'Standard' }}
               </span>
             </td>
@@ -399,17 +405,24 @@ onMounted(async () => {
   color: #6e6e73;
 }
 
-.badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 980px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.feat-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: #1d1d1f;
 }
 
-.badge-blue { background: rgba(0,113,227,0.1); color: #0071e3; }
-.badge-grey { background: #f0f0f5; color: #6e6e73; }
+.feat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.feat-on .feat-dot { background: #0071e3; }
+.feat-off .feat-dot { background: #aeaeb2; }
+.feat-off { color: #6e6e73; }
 
 .td-actions {
   display: flex;
