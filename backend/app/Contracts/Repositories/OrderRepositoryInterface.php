@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface OrderRepositoryInterface
 {
+    public function all(): Collection;
+
     public function forUser(int $userId): Collection;
 
     public function find(int $id): ?Order;

@@ -1,5 +1,5 @@
 import apiClient from '@/api/client'
-import type { Product, Category, AdminProductPayload, AdminCategoryPayload } from '@/api/types'
+import type { Product, Category, Order, OrderStatus, AdminProductPayload, AdminCategoryPayload } from '@/api/types'
 
 function productToFormData(payload: Partial<AdminProductPayload>): FormData {
   const fd = new FormData()
@@ -39,6 +39,16 @@ export const adminProductsService = {
 
   destroy(id: number): Promise<void> {
     return apiClient.delete(`/admin/products/${id}`).then(() => undefined)
+  },
+}
+
+export const adminOrdersService = {
+  getAll(): Promise<Order[]> {
+    return apiClient.get<Order[]>('/admin/orders').then((r) => r.data)
+  },
+
+  updateStatus(id: number, status: OrderStatus): Promise<Order> {
+    return apiClient.patch<Order>(`/admin/orders/${id}/status`, { status }).then((r) => r.data)
   },
 }
 

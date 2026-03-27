@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productsService } from '@/api/services/products.service'
 import { useCartStore } from '@/stores/cart'
+import AppSpinner from '@/components/AppSpinner.vue'
 import type { Product } from '@/api/types'
 
 const route = useRoute()
@@ -17,7 +18,7 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-    product.value = await productsService.getById(Number(route.params.id))
+    product.value = await productsService.getBySlug(route.params.slug as string)
   } catch {
     error.value = 'Product not found.'
   } finally {
@@ -25,7 +26,7 @@ onMounted(async () => {
   }
 })
 
-async function addToBag() {
+async function addToCart() {
   if (!product.value || adding.value || product.value.stock_quantity === 0) return
   adding.value = true
   try {
@@ -46,7 +47,7 @@ function formatPrice(price: number): string {
   <div class="detail-page">
     <!-- Loading -->
     <div v-if="loading" class="state-center">
-      <div class="spinner" />
+      <AppSpinner size="28px" />
     </div>
 
     <!-- Error -->
@@ -104,11 +105,12 @@ function formatPrice(price: number): string {
             class="add-btn"
             :class="{ added, 'out-of-stock': product.stock_quantity === 0 }"
             :disabled="adding || product.stock_quantity === 0"
-            @click="addToBag"
+            @click="addToCart"
           >
-            <template v-if="product.stock_quantity === 0">Out of Stock</template>
-            <template v-else-if="added">Added to Bag</template>
-            <template v-else>Add to Bag</template>
+            <span v-if="adding" class="btn-spinner" />
+            <template v-else-if="product.stock_quantity === 0">Out of Stock</template>
+            <template v-else-if="added">Added to Cart</template>
+            <template v-else>Add to Cart</template>
           </button>
 
           <button class="back-btn" @click="router.back()">
@@ -139,17 +141,6 @@ function formatPrice(price: number): string {
   padding: 100px 0;
   gap: 16px;
 }
-
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid #d2d2d7;
-  border-top-color: #0071e3;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
 
 .error-text {
   font-size: 1rem;
@@ -305,6 +296,21 @@ function formatPrice(price: number): string {
 }
 
 .add-btn:hover:not(:disabled) { background: #0077ed; }
+
+.btn-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
 
 .add-btn.added { background: #28cd41; }
 

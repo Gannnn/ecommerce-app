@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { useOrderStore } from '@/stores/orders'
 import type { OrderStatus } from '@/api/types'
 import OrderStatusBadge from '@/components/OrderStatusBadge.vue'
+import AppSpinner from '@/components/AppSpinner.vue'
 
 const orderStore = useOrderStore()
 
@@ -33,7 +34,7 @@ async function changeStatus(orderId: number, status: string) {
       <h1 class="section-title">Your Orders</h1>
 
       <div v-if="orderStore.loading" class="loading">
-        <div class="spinner" />
+        <AppSpinner size="28px" />
       </div>
 
       <div v-else-if="orderStore.orders.length === 0" class="empty-state">
@@ -93,19 +94,6 @@ async function changeStatus(orderId: number, status: string) {
   display: flex;
   justify-content: center;
   padding: 80px 0;
-}
-
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--apple-border);
-  border-top-color: var(--apple-blue);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 .empty-state {

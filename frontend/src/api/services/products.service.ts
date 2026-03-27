@@ -6,7 +6,7 @@ export const productsService = {
     return apiClient.get<Product[]>('/products', { params }).then((r) => r.data)
   },
 
-  getById(id: number): Promise<Product> {
-    return apiClient.get<Product>(`/products/${id}`).then((r) => r.data)
+  getBySlug(slug: string): Promise<Product> {
+    return apiClient.get<Product>(`/products/${slug}`).then((r) => r.data)
   },
 }

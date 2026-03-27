@@ -16,14 +16,15 @@ class ProductController extends Controller
         $products = $this->productService->getProducts(
             search: $request->query('search'),
             category: $request->query('category'),
+            sort: $request->query('sort'),
         );
 
         return response()->json($products);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(string $slug): JsonResponse
     {
-        $product = $this->productService->getProduct($id);
+        $product = $this->productService->getProduct($slug);
 
         return response()->json($product);
     }

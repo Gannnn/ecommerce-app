@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class OrderRepository implements OrderRepositoryInterface
 {
+    public function all(): Collection
+    {
+        return Order::with('items.product')->latest()->get();
+    }
+
     public function forUser(int $userId): Collection
     {
         return Order::with('items.product')

@@ -69,6 +69,7 @@ export interface OrderItem {
   product_price: number
   quantity: number
   subtotal: number
+  product: { image_url: string; slug: string } | null
 }
 
 export interface Order {

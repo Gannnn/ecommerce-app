@@ -10,4 +10,6 @@ interface ProductRepositoryInterface
     public function all(array $filters = []): Collection;
 
     public function find(int $id): ?Product;
+
+    public function findBySlug(string $slug): ?Product;
 }

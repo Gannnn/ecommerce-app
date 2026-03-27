@@ -12,6 +12,7 @@ export const useProductStore = defineStore('products', () => {
 
   async function fetchProducts(params?: GetProductsParams) {
     loading.value = true
+    products.value = []
     try {
       products.value = await productsService.getAll(params)
     } finally {

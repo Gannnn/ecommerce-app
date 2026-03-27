@@ -5,6 +5,7 @@ import { useProductStore } from '@/stores/products'
 import { categoriesService } from '@/api/services/categories.service'
 import type { Category, GetProductsParams } from '@/api/types'
 import ProductCard from '@/components/ProductCard.vue'
+import AppSpinner from '@/components/AppSpinner.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -56,7 +57,12 @@ watch(
   },
 )
 
-watch([search, sort], fetchWithParams)
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+watch(search, () => {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(fetchWithParams, 300)
+})
+watch(sort, fetchWithParams)
 
 function selectCategory(slug: string) {
   selectedCategory.value = slug
@@ -146,9 +152,9 @@ const pageTitle = computed(() => {
     <!-- Body: sidebar + grid -->
     <div class="body-layout" :class="{ 'filter-open': filterOpen }">
 
-      <!-- Filter panel with slide transition -->
-      <Transition name="filter">
-        <aside v-if="filterOpen" class="filter-panel">
+      <!-- Filter panel -->
+      <div class="filter-panel-wrap" :class="{ 'is-open': filterOpen }">
+        <aside class="filter-panel">
           <div class="search-wrap">
             <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -172,14 +178,14 @@ const pageTitle = computed(() => {
             >{{ cat.name }}</button>
           </nav>
         </aside>
-      </Transition>
+      </div>
 
       <!-- Product grid -->
       <main class="grid-area">
         <p class="result-count">{{ productStore.products.length }} Products</p>
 
         <div v-if="productStore.loading" class="loading">
-          <div class="spinner" />
+          <AppSpinner size="28px" />
         </div>
 
         <div v-else-if="productStore.products.length === 0" class="empty-state">
@@ -378,34 +384,27 @@ const pageTitle = computed(() => {
 }
 
 /* Filter panel */
+.filter-panel-wrap {
+  flex-shrink: 0;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-width 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease;
+}
+
+.filter-panel-wrap.is-open {
+  max-width: 265px;
+  opacity: 1;
+}
+
 .filter-panel {
   width: 240px;
-  flex-shrink: 0;
   padding: 24px 24px 24px 0;
   border-right: 1px solid #d2d2d7;
   position: sticky;
   top: 52px;
-  overflow: hidden;
-}
-
-/* Filter slide transition */
-.filter-enter-active {
-  transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.25s ease;
-}
-.filter-leave-active {
-  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.18s ease;
-}
-.filter-enter-from,
-.filter-leave-to {
-  width: 0 !important;
-  opacity: 0;
-}
-.filter-enter-to,
-.filter-leave-from {
-  width: 240px;
-  opacity: 1;
 }
 
 .search-wrap {
@@ -477,12 +476,7 @@ const pageTitle = computed(() => {
 .grid-area {
   flex: 1;
   min-width: 0;
-  padding: 20px 0 0 0;
-  transition: padding-left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.filter-open .grid-area {
-  padding-left: 32px;
+  padding: 20px 0 0 32px;
 }
 
 .result-count {
@@ -508,17 +502,6 @@ const pageTitle = computed(() => {
   justify-content: center;
   padding: 80px 0;
 }
-
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid #d2d2d7;
-  border-top-color: #0071e3;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
 
 .empty-state {
   text-align: center;

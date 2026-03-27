@@ -8,14 +8,14 @@ const props = defineProps<{ product: Product }>()
 const router = useRouter()
 
 function goToDetail() {
-  router.push({ name: 'product-detail', params: { id: props.product.id } })
+  router.push({ name: 'product-detail', params: { slug: props.product.slug } })
 }
 
 const cart = useCartStore()
 const adding = ref(false)
 const added = ref(false)
 
-async function addToBag() {
+async function addToCart() {
   if (adding.value || props.product.stock_quantity === 0) return
   adding.value = true
   try {
@@ -48,7 +48,7 @@ function formatPrice(price: number): string {
 
     <!-- Info area -->
     <div class="product-info" @click="goToDetail">
-      <p v-if="product.is_featured" class="label-new">New</p>
+      <p class="label-new" :style="{ visibility: product.is_featured ? 'visible' : 'hidden' }">New</p>
       <p class="product-name">{{ product.name }}</p>
       <p class="product-price">{{ formatPrice(product.price) }}</p>
 
@@ -56,11 +56,12 @@ function formatPrice(price: number): string {
         class="add-btn"
         :class="{ added, 'out-of-stock': product.stock_quantity === 0 }"
         :disabled="adding || product.stock_quantity === 0"
-        @click.stop="addToBag"
+        @click.stop="addToCart"
       >
-        <template v-if="product.stock_quantity === 0">Out of Stock</template>
-        <template v-else-if="added">Added to Bag</template>
-        <template v-else>Add to Bag</template>
+        <span v-if="adding" class="btn-spinner" />
+        <template v-else-if="product.stock_quantity === 0">Out of Stock</template>
+        <template v-else-if="added">Added to Cart</template>
+        <template v-else>Add to Cart</template>
       </button>
     </div>
   </div>
@@ -105,6 +106,7 @@ function formatPrice(price: number): string {
   text-align: center;
   gap: 4px;
   background: #fff;
+  flex: 1;
 }
 
 .label-new {
@@ -133,6 +135,7 @@ function formatPrice(price: number): string {
 
 .add-btn {
   display: inline-block;
+  margin-top: auto;
   background: #0071e3;
   color: #fff;
   border: none;
@@ -148,6 +151,21 @@ function formatPrice(price: number): string {
 
 .add-btn:hover:not(:disabled) {
   background: #0077ed;
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
 }
 
 .add-btn.added {

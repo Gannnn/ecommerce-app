@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
-import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
 const cart = useCartStore()
-const router = useRouter()
-
-async function handleLogout() {
-  await auth.logout()
-  router.push('/')
-}
 
 const categories = [
   { label: 'Mac',         slug: 'mac' },
@@ -41,9 +34,6 @@ const categories = [
           :to="`/?category=${cat.slug}`"
           class="nav-item"
         >{{ cat.label }}</RouterLink>
-        <template v-if="auth.isAuthenticated">
-          <RouterLink to="/orders" class="nav-item">Orders</RouterLink>
-        </template>
         <template v-if="auth.isAdmin">
           <RouterLink to="/admin" class="nav-item admin-link">Admin</RouterLink>
         </template>
@@ -51,19 +41,20 @@ const categories = [
 
       <!-- Right icons -->
       <div class="nav-actions">
-        <RouterLink to="/cart" class="nav-action cart-action" aria-label="Shopping bag">
+        <RouterLink to="/cart" class="nav-action cart-action" aria-label="Shopping cart">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
+            <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.71L23 6H6" />
           </svg>
           <span v-if="cart.itemCount > 0" class="cart-badge">{{ cart.itemCount }}</span>
         </RouterLink>
 
         <template v-if="auth.isAuthenticated">
-          <button class="nav-action" @click="handleLogout" title="Sign Out">
+          <RouterLink to="/account" class="nav-action" aria-label="Account">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
             </svg>
-          </button>
+          </RouterLink>
         </template>
         <template v-else>
           <RouterLink to="/login" class="nav-action" aria-label="Sign in">
@@ -85,7 +76,7 @@ const categories = [
   right: 0;
   z-index: 100;
   height: 44px;
-  background: rgba(22, 22, 23, 0.9);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: saturate(180%) blur(20px);
 }
 
@@ -100,7 +91,7 @@ const categories = [
 }
 
 .apple-logo {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   transition: color 0.2s;
@@ -108,7 +99,7 @@ const categories = [
 }
 
 .apple-logo:hover {
-  color: white;
+  color: black;
 }
 
 .nav-categories {
@@ -118,7 +109,7 @@ const categories = [
 }
 
 .nav-item {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(0, 0, 0, 0.8);
   text-decoration: none;
   font-size: 0.75rem;
   font-weight: 400;
@@ -131,17 +122,17 @@ const categories = [
 }
 
 .nav-item:hover {
-  color: white;
+  color: black;
 }
 
 .admin-link {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.5);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
 }
 
 .admin-link:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(0, 0, 0, 0.85);
 }
 
 .nav-actions {
@@ -152,7 +143,7 @@ const categories = [
 }
 
 .nav-action {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,7 +158,7 @@ const categories = [
 }
 
 .nav-action:hover {
-  color: white;
+  color: black;
 }
 
 .cart-action {

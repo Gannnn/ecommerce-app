@@ -8,7 +8,7 @@ const links = [
   },
   {
     heading: 'Account',
-    items: ['Sign In', 'Create Account', 'Your Orders', 'Your Bag'],
+    items: ['Sign In', 'Create Account', 'Your Orders', 'Your Cart'],
   },
   {
     heading: 'Apple Store',

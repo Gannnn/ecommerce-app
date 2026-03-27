@@ -7,6 +7,7 @@ const props = defineProps<{ item: CartItem }>()
 
 const cart = useCartStore()
 const updating = ref(false)
+const removing = ref(false)
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
@@ -24,7 +25,12 @@ async function changeQty(delta: number) {
 }
 
 async function remove() {
-  await cart.removeItem(props.item.id)
+  removing.value = true
+  try {
+    await cart.removeItem(props.item.id)
+  } finally {
+    removing.value = false
+  }
 }
 </script>
 
@@ -40,18 +46,24 @@ async function remove() {
       <p class="cart-name">{{ item.product.name }}</p>
       <p class="cart-unit-price">{{ formatPrice(item.product.price) }} each</p>
     </div>
-    <div class="qty-stepper">
-      <button class="qty-btn" :disabled="item.quantity <= 1 || updating" @click="changeQty(-1)">−</button>
-      <span class="qty-value">{{ item.quantity }}</span>
-      <button
-        class="qty-btn"
-        :disabled="item.quantity >= item.product.stock_quantity || updating"
-        @click="changeQty(1)"
-      >+</button>
+    <div class="qty-stepper" :class="{ 'is-updating': updating }">
+      <template v-if="updating">
+        <span class="stepper-spinner" />
+      </template>
+      <template v-else>
+        <button class="qty-btn" :disabled="item.quantity <= 1" @click="changeQty(-1)">−</button>
+        <span class="qty-value">{{ item.quantity }}</span>
+        <button
+          class="qty-btn"
+          :disabled="item.quantity >= item.product.stock_quantity"
+          @click="changeQty(1)"
+        >+</button>
+      </template>
     </div>
     <p class="cart-subtotal">{{ formatPrice(item.product.price * item.quantity) }}</p>
-    <button class="remove-btn" title="Remove" @click="remove">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="remove-btn" :disabled="removing" title="Remove" @click="remove">
+      <span v-if="removing" class="remove-spinner" />
+      <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18" />
         <line x1="6" y1="6" x2="18" y2="18" />
       </svg>
@@ -63,18 +75,18 @@ async function remove() {
 .cart-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 0;
+  gap: 20px;
+  padding: 20px 0;
   border-bottom: 1px solid var(--apple-border);
 }
 
 .cart-image {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
-  background: var(--apple-light);
-  border-radius: 12px;
-  padding: 8px;
+  background: #f5f5f7;
+  border-radius: 14px;
+  padding: 10px;
   flex-shrink: 0;
 }
 
@@ -156,8 +168,42 @@ async function remove() {
   transition: color 0.2s, background 0.2s;
 }
 
-.remove-btn:hover {
+.remove-btn:hover:not(:disabled) {
   color: var(--apple-red);
   background: rgba(255, 59, 48, 0.08);
+}
+
+.remove-btn:disabled {
+  cursor: not-allowed;
+}
+
+.qty-stepper.is-updating {
+  min-width: 80px;
+  justify-content: center;
+}
+
+.stepper-spinner,
+.remove-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  animation: row-spin 0.6s linear infinite;
+}
+
+.stepper-spinner {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--apple-border);
+  border-top-color: var(--apple-dark);
+}
+
+.remove-spinner {
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-top-color: var(--apple-mid);
+}
+
+@keyframes row-spin {
+  to { transform: rotate(360deg); }
 }
 </style>

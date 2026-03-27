@@ -14,10 +14,7 @@ class ProductRepository implements ProductRepositoryInterface
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
+            $query->where('name', 'like', "%{$search}%");
         }
 
         if (!empty($filters['category'])) {
@@ -36,5 +33,10 @@ class ProductRepository implements ProductRepositoryInterface
     public function find(int $id): ?Product
     {
         return Product::with(['category', 'media'])->find($id);
+    }
+
+    public function findBySlug(string $slug): ?Product
+    {
+        return Product::with(['category', 'media'])->where('slug', $slug)->first();
     }
 }

@@ -15,6 +15,16 @@ class OrderService
         private readonly CartRepositoryInterface $cartRepository
     ) {}
 
+    public function getAllOrders(): Collection
+    {
+        return $this->orderRepository->all();
+    }
+
+    public function adminUpdateStatus(int $orderId, string $status): Order
+    {
+        return $this->orderRepository->updateStatus($orderId, $status);
+    }
+
     public function getUserOrders(int $userId): Collection
     {
         return $this->orderRepository->forUser($userId);

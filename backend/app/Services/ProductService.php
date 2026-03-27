@@ -12,19 +12,20 @@ class ProductService
         private readonly ProductRepositoryInterface $productRepository
     ) {}
 
-    public function getProducts(?string $search = null, ?string $category = null): Collection
+    public function getProducts(?string $search = null, ?string $category = null, ?string $sort = null): Collection
     {
         $filters = array_filter([
             'search'   => $search,
             'category' => $category,
+            'sort'     => $sort,
         ]);
 
         return $this->productRepository->all($filters);
     }
 
-    public function getProduct(int $id): Product
+    public function getProduct(string $slug): Product
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productRepository->findBySlug($slug);
 
         if (!$product) {
             abort(404, 'Product not found.');

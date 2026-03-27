@@ -1,12 +1,23 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useOrderStore } from '@/stores/orders'
-import type { OrderStatus } from '@/api/types'
+import { ref, onMounted } from 'vue'
+import { adminOrdersService } from '@/api/services/admin.service'
+import type { Order, OrderStatus } from '@/api/types'
 import OrderStatusBadge from '@/components/OrderStatusBadge.vue'
+import AppSpinner from '@/components/AppSpinner.vue'
 
-const orderStore = useOrderStore()
+const orders = ref<Order[]>([])
+const loading = ref(false)
 
-onMounted(() => orderStore.fetchOrders())
+onMounted(fetchAll)
+
+async function fetchAll() {
+  loading.value = true
+  try {
+    orders.value = await adminOrdersService.getAll()
+  } finally {
+    loading.value = false
+  }
+}
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
@@ -19,25 +30,29 @@ function formatDate(dateStr: string): string {
 const statuses: OrderStatus[] = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
 
 async function changeStatus(orderId: number, status: string) {
-  await orderStore.updateStatus(orderId, status as OrderStatus)
+  await adminOrdersService.updateStatus(orderId, status as OrderStatus)
+  await fetchAll()
 }
 </script>
 
 <template>
   <div class="page">
     <div class="page-header">
-      <h1 class="page-title">Orders</h1>
+      <div>
+        <h1 class="page-title">Orders</h1>
+        <p class="page-sub">{{ orders.length }} total</p>
+      </div>
     </div>
 
-    <div v-if="orderStore.loading" class="loading">
-      <div class="spinner" />
+    <div v-if="loading" class="loading">
+      <AppSpinner size="28px" />
     </div>
 
-    <div v-else-if="orderStore.orders.length === 0" class="empty">
+    <div v-else-if="orders.length === 0" class="empty-state">
       No orders yet.
     </div>
 
-    <div v-else class="card">
+    <div v-else class="table-card">
       <table class="table">
         <thead>
           <tr>
@@ -50,7 +65,7 @@ async function changeStatus(orderId: number, status: string) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="order in orderStore.orders" :key="order.id">
+          <tr v-for="order in orders" :key="order.id" class="table-row">
             <td class="td-name">#{{ order.id }}</td>
             <td class="td-meta">{{ formatDate(order.created_at) }}</td>
             <td class="td-meta">{{ order.items.length }}</td>
@@ -77,17 +92,25 @@ async function changeStatus(orderId: number, status: string) {
 <style scoped>
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  padding-bottom: 24px;
   margin-bottom: 32px;
+  border-bottom: 1px solid #d2d2d7;
 }
 
 .page-title {
   font-size: 1.75rem;
   font-weight: 600;
   color: #1d1d1f;
-  margin: 0;
+  margin: 0 0 2px;
   letter-spacing: -0.02em;
+}
+
+.page-sub {
+  font-size: 0.8125rem;
+  color: #6e6e73;
+  margin: 0;
 }
 
 .loading {
@@ -96,27 +119,16 @@ async function changeStatus(orderId: number, status: string) {
   padding: 80px 0;
 }
 
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid #d2d2d7;
-  border-top-color: #0071e3;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.empty {
+.empty-state {
   text-align: center;
   padding: 80px 0;
   color: #6e6e73;
   font-size: 0.9375rem;
 }
 
-.card {
+.table-card {
   background: #fff;
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid #d2d2d7;
 }
@@ -129,23 +141,24 @@ async function changeStatus(orderId: number, status: string) {
 .table thead { background: #f5f5f7; }
 
 .table th {
-  padding: 12px 16px;
+  padding: 11px 16px;
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   color: #6e6e73;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   border-bottom: 1px solid #d2d2d7;
 }
 
 .table td {
   padding: 14px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f5;
   vertical-align: middle;
 }
 
-.table tr:last-child td { border-bottom: none; }
+.table-row:last-child td { border-bottom: none; }
+.table-row:hover td { background: #fafafa; }
 
 .td-name {
   font-size: 0.9375rem;
@@ -158,14 +171,16 @@ async function changeStatus(orderId: number, status: string) {
 .status-select {
   border: 1px solid #d2d2d7;
   border-radius: 8px;
-  padding: 5px 10px;
+  padding: 6px 10px;
   font-size: 0.8125rem;
   font-family: inherit;
   color: #1d1d1f;
   background: #fff;
   cursor: pointer;
   outline: none;
+  transition: border-color 0.15s;
 }
 
 .status-select:focus { border-color: #0071e3; }
+.status-select:hover { border-color: #aeaeb2; }
 </style>

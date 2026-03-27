@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\Admin\AdminProductController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\Admin\AdminOrderController;
 use Illuminate\Support\Facades\Route;
 
 // Categories (public)
@@ -18,7 +19,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 // Products (public)
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{slug}', [ProductController::class, 'show']);
 
 // Cart (public — session-based)
 Route::get('/cart', [CartController::class, 'index']);
@@ -42,4 +43,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('products', AdminProductController::class);
     Route::apiResource('categories', AdminCategoryController::class)->except(['show']);
+    Route::get('orders', [AdminOrderController::class, 'index']);
+    Route::patch('orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
 });
