@@ -28,11 +28,19 @@ class OrderController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'notes' => 'nullable|string|max:500',
+            'notes'         => 'nullable|string|max:500',
+            'currency_code' => 'nullable|string|size:3',
+            'currency_rate' => 'nullable|numeric|min:0',
+            'currency_unit' => 'nullable|integer|min:1',
         ]);
 
-        $sessionId = $request->header('X-Session-ID', '');
-        $order = $this->orderService->placeOrder($sessionId, $request->user()->id, $data['notes'] ?? null);
+        $order = $this->orderService->placeOrder(
+            $request->user()->id,
+            $data['notes'] ?? null,
+            $data['currency_code'] ?? 'MYR',
+            isset($data['currency_rate']) ? (float) $data['currency_rate'] : null,
+            $data['currency_unit'] ?? 1,
+        );
 
         return response()->json($order, 201);
     }

@@ -8,23 +8,35 @@ use Illuminate\Database\Eloquent\Collection;
 
 class CartRepository implements CartRepositoryInterface
 {
-    public function getBySession(string $sessionId): Collection
+    public function getCart(?string $sessionId, ?int $userId): Collection
     {
+        if ($userId) {
+            return CartItem::with('product')->where('user_id', $userId)->get();
+        }
+
         return CartItem::with('product')
             ->where('session_id', $sessionId)
+            ->whereNull('user_id')
             ->get();
     }
 
-    public function findItem(string $sessionId, int $productId): ?CartItem
+    public function findItem(?string $sessionId, int $productId, ?int $userId = null): ?CartItem
     {
+        if ($userId) {
+            return CartItem::where('user_id', $userId)
+                ->where('product_id', $productId)
+                ->first();
+        }
+
         return CartItem::where('session_id', $sessionId)
+            ->whereNull('user_id')
             ->where('product_id', $productId)
             ->first();
     }
 
-    public function addItem(string $sessionId, int $productId, int $quantity, ?int $userId = null): CartItem
+    public function addItem(?string $sessionId, int $productId, int $quantity, ?int $userId = null): CartItem
     {
-        $existing = $this->findItem($sessionId, $productId);
+        $existing = $this->findItem($sessionId, $productId, $userId);
 
         if ($existing) {
             $existing->increment('quantity', $quantity);
@@ -32,7 +44,7 @@ class CartRepository implements CartRepositoryInterface
         }
 
         return CartItem::create([
-            'session_id' => $sessionId,
+            'session_id' => $userId ? null : $sessionId,
             'product_id' => $productId,
             'quantity'   => $quantity,
             'user_id'    => $userId,
@@ -51,9 +63,13 @@ class CartRepository implements CartRepositoryInterface
         CartItem::destroy($cartItemId);
     }
 
-    public function clearSession(string $sessionId): void
+    public function clearCart(?string $sessionId, ?int $userId): void
     {
-        CartItem::where('session_id', $sessionId)->delete();
+        if ($userId) {
+            CartItem::where('user_id', $userId)->delete();
+        } else {
+            CartItem::where('session_id', $sessionId)->whereNull('user_id')->delete();
+        }
     }
 
     public function mergeToUser(string $sessionId, int $userId): void
@@ -63,8 +79,7 @@ class CartRepository implements CartRepositoryInterface
             ->get();
 
         foreach ($guestItems as $guestItem) {
-            $existing = CartItem::where('session_id', $sessionId)
-                ->where('user_id', $userId)
+            $existing = CartItem::where('user_id', $userId)
                 ->where('product_id', $guestItem->product_id)
                 ->first();
 
@@ -72,7 +87,7 @@ class CartRepository implements CartRepositoryInterface
                 $existing->increment('quantity', $guestItem->quantity);
                 $guestItem->delete();
             } else {
-                $guestItem->update(['user_id' => $userId]);
+                $guestItem->update(['user_id' => $userId, 'session_id' => null]);
             }
         }
     }

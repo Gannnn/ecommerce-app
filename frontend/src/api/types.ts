@@ -5,6 +5,25 @@
  * returned by the Laravel backend.  Import from here, not from stores.
  */
 
+// ─── Currencies ───────────────────────────────────────────────────────────────
+
+export interface Currency {
+  id: number
+  code: string
+  name: string
+  symbol: string | null
+  unit: number
+  buying_rate: number | null
+  selling_rate: number | null
+  middle_rate: number | null
+  rate_date: string | null
+  is_active: boolean
+  is_default: boolean
+  last_updated_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 // ─── Categories ──────────────────────────────────────────────────────────────
 
 export interface Category {
@@ -41,7 +60,7 @@ export interface GetProductsParams {
 
 export interface CartItem {
   id: number
-  session_id: string
+  session_id: string | null
   user_id: number | null
   product_id: number
   quantity: number
@@ -79,6 +98,9 @@ export interface Order {
   subtotal: number
   total: number
   notes: string | null
+  currency_code: string
+  currency_rate: number | null
+  currency_unit: number
   created_at: string
   updated_at: string
   items: OrderItem[]
@@ -86,6 +108,9 @@ export interface Order {
 
 export interface PlaceOrderPayload {
   notes?: string
+  currency_code?: string
+  currency_rate?: number | null
+  currency_unit?: number
 }
 
 export interface UpdateOrderStatusPayload {
@@ -99,8 +124,19 @@ export interface User {
   name: string
   email: string
   email_verified_at: string | null
-  is_admin: boolean
   created_at: string
+}
+
+export interface Admin {
+  id: number
+  name: string
+  email: string
+  created_at: string
+}
+
+export interface AdminAuthResponse {
+  admin: Admin
+  token: string
 }
 
 // ─── Admin Payloads ───────────────────────────────────────────────────────────

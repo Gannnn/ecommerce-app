@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useAdminAuthStore } from '@/stores/adminAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,9 +42,14 @@ const router = createRouter({
       component: () => import('@/views/RegisterView.vue'),
     },
     {
+      path: '/admin/login',
+      name: 'admin-login',
+      component: () => import('@/views/admin/AdminLoginView.vue'),
+    },
+    {
       path: '/admin',
       component: () => import('@/layouts/AdminLayout.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: { requiresAdminAuth: true },
       children: [
         { path: '', redirect: { name: 'admin-products' } },
         {
@@ -61,6 +67,11 @@ const router = createRouter({
           name: 'admin-orders',
           component: () => import('@/views/admin/AdminOrdersView.vue'),
         },
+        {
+          path: 'currencies',
+          name: 'admin-currencies',
+          component: () => import('@/views/admin/AdminCurrenciesView.vue'),
+        },
       ],
     },
   ],
@@ -68,18 +79,29 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
+  const adminAuth = useAdminAuthStore()
 
-  // On hard reload: token exists but user not yet fetched
+  // On hard reload: restore user session
   if (auth.token && !auth.user) {
     await auth.fetchUser()
+  }
+
+  // On hard reload: restore admin session
+  if (adminAuth.token && !adminAuth.admin) {
+    await adminAuth.fetchMe()
   }
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
 
-  if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return { name: 'catalogue' }
+  if (to.meta.requiresAdminAuth && !adminAuth.isAuthenticated) {
+    return { name: 'admin-login' }
+  }
+
+  // Redirect already-authenticated admins away from login page
+  if (to.name === 'admin-login' && adminAuth.isAuthenticated) {
+    return { name: 'admin-products' }
   }
 })
 

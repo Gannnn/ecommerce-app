@@ -19,12 +19,40 @@ async function fetchAll() {
   }
 }
 
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
+function formatOrderPrice(myrAmount: number, order: Order): string {
+  const { currency_code: code, currency_rate: rate, currency_unit: unit } = order
+  if (code === 'MYR' || !rate) return `RM ${myrAmount.toFixed(2)}`
+  const converted = (myrAmount * (unit ?? 1)) / rate
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(converted)
+  } catch {
+    return `${code} ${converted.toFixed(2)}`
+  }
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  return (
+    new Date(dateStr).toLocaleString('en-MY', {
+      timeZone: 'Asia/Kuala_Lumpur',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }) + ' MYT'
+  )
+}
+
+function formatRate(order: Order): string | null {
+  if (order.currency_code === 'MYR' || !order.currency_rate) return null
+  const unit = order.currency_unit ?? 1
+  return `${unit} ${order.currency_code} = RM ${order.currency_rate.toFixed(4)}`
 }
 
 const statuses: OrderStatus[] = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
@@ -57,9 +85,10 @@ async function changeStatus(orderId: number, status: string) {
         <thead>
           <tr>
             <th>Order</th>
-            <th>Date</th>
+            <th>Date (MYT)</th>
             <th>Items</th>
             <th>Total</th>
+            <th>Currency</th>
             <th>Status</th>
             <th>Update Status</th>
           </tr>
@@ -67,9 +96,18 @@ async function changeStatus(orderId: number, status: string) {
         <tbody>
           <tr v-for="order in orders" :key="order.id" class="table-row">
             <td class="td-name">#{{ order.id }}</td>
-            <td class="td-meta">{{ formatDate(order.created_at) }}</td>
+            <td class="td-meta td-date">{{ formatDate(order.created_at) }}</td>
             <td class="td-meta">{{ order.items.length }}</td>
-            <td class="td-meta">{{ formatPrice(order.total) }}</td>
+            <td class="td-meta">
+              <span>{{ formatOrderPrice(order.total, order) }}</span>
+              <span v-if="order.currency_code !== 'MYR'" class="td-sub">RM {{ order.total.toFixed(2) }}</span>
+            </td>
+            <td class="td-meta">
+              <span class="currency-badge" :class="{ 'currency-badge-foreign': order.currency_code !== 'MYR' }">
+                {{ order.currency_code }}
+              </span>
+              <span v-if="formatRate(order)" class="td-sub">{{ formatRate(order) }}</span>
+            </td>
             <td><OrderStatusBadge :status="order.status" /></td>
             <td>
               <div class="select-wrap">
@@ -172,6 +210,33 @@ async function changeStatus(orderId: number, status: string) {
 }
 
 .td-meta { font-size: 0.875rem; color: #6e6e73; }
+
+.td-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: #aeaeb2;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-date {
+  white-space: nowrap;
+}
+
+.currency-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #6e6e73;
+  background: #f5f5f7;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.currency-badge-foreign {
+  color: #0071e3;
+  background: rgba(0, 113, 227, 0.08);
+}
 
 .select-wrap {
   position: relative;

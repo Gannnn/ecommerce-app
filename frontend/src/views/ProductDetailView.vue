@@ -3,12 +3,14 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productsService } from '@/api/services/products.service'
 import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
 import AppSpinner from '@/components/AppSpinner.vue'
 import type { Product } from '@/api/types'
 
 const route = useRoute()
 const router = useRouter()
 const cart = useCartStore()
+const currency = useCurrencyStore()
 
 const product = ref<Product | null>(null)
 const loading = ref(true)
@@ -38,9 +40,6 @@ async function addToCart() {
   }
 }
 
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
-}
 </script>
 
 <template>
@@ -89,7 +88,7 @@ function formatPrice(price: number): string {
           <p v-if="product.is_featured" class="label-new">New</p>
 
           <h1 class="product-name">{{ product.name }}</h1>
-          <p class="product-price">{{ formatPrice(product.price) }}</p>
+          <p class="product-price">{{ currency.formatPrice(product.price) }}</p>
 
           <p class="product-description">{{ product.description }}</p>
 

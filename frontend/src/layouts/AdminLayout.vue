@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
+import { useAdminAuthStore } from '@/stores/adminAuth'
 import { useRouter } from 'vue-router'
 
-const auth = useAuthStore()
+const adminAuth = useAdminAuthStore()
 const router = useRouter()
 
 async function handleLogout() {
-  await auth.logout()
-  router.push({ name: 'login' })
+  await adminAuth.logout()
+  router.push({ name: 'admin-login' })
 }
 </script>
 
@@ -21,7 +21,7 @@ async function handleLogout() {
           </svg>
           <div class="brand-text">
             <span class="brand-title">Admin</span>
-            <span class="brand-name">{{ auth.user?.name }}</span>
+            <span class="brand-name">{{ adminAuth.admin?.name }}</span>
           </div>
         </div>
 
@@ -45,6 +45,13 @@ async function handleLogout() {
               <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.71L23 6H6" />
             </svg>
             Orders
+          </RouterLink>
+          <RouterLink :to="{ name: 'admin-currencies' }" class="nav-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v2m0 8v2M8.5 9.5A3.5 3.5 0 0112 8h.5a2.5 2.5 0 010 5h-1a2.5 2.5 0 000 5H12a3.5 3.5 0 003.5-1.5" />
+            </svg>
+            Currencies
           </RouterLink>
         </nav>
       </div>

@@ -5,16 +5,21 @@ import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
+const currencyStore = useCurrencyStore()
 const route = useRoute()
 
 const isAdmin = computed(() => route.path.startsWith('/admin'))
 
 onMounted(async () => {
-  await authStore.fetchUser()
-  await cartStore.fetchCart()
+  await Promise.all([
+    authStore.fetchUser(),
+    cartStore.fetchCart(),
+    currencyStore.fetchCurrencies(),
+  ])
 })
 </script>
 

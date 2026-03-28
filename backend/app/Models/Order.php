@@ -17,13 +17,18 @@ class Order extends Model
         'subtotal',
         'total',
         'notes',
+        'currency_code',
+        'currency_rate',
+        'currency_unit',
     ];
 
     protected function casts(): array
     {
         return [
-            'subtotal' => 'float',
-            'total' => 'float',
+            'subtotal'      => 'float',
+            'total'         => 'float',
+            'currency_rate' => 'float',
+            'currency_unit' => 'integer',
         ];
     }
 

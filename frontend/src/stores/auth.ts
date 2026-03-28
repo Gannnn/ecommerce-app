@@ -8,7 +8,6 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('auth_token'))
 
   const isAuthenticated = computed(() => !!token.value)
-  const isAdmin = computed(() => !!user.value?.is_admin)
 
   function _persistToken(newToken: string) {
     token.value = newToken
@@ -49,5 +48,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, token, isAuthenticated, isAdmin, register, login, logout, fetchUser }
+  return { user, token, isAuthenticated, register, login, logout, fetchUser }
 })

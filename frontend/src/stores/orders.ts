@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { ordersService } from '@/api/services/orders.service'
+import { useCurrencyStore } from '@/stores/currency'
 import type { Order, OrderStatus } from '@/api/types'
 
 export type { Order, OrderStatus }
@@ -19,7 +20,14 @@ export const useOrderStore = defineStore('orders', () => {
   }
 
   async function placeOrder(notes?: string): Promise<Order> {
-    const order = await ordersService.placeOrder({ notes })
+    const currencyStore = useCurrencyStore()
+    const cur = currencyStore.selected
+    const order = await ordersService.placeOrder({
+      notes,
+      currency_code: cur?.code ?? 'MYR',
+      currency_rate: cur?.middle_rate ?? null,
+      currency_unit: cur?.unit ?? 1,
+    })
     orders.value.unshift(order)
     return order
   }

@@ -41,9 +41,14 @@ class OrderService
         return $order;
     }
 
-    public function placeOrder(string $sessionId, int $userId, ?string $notes = null): Order
-    {
-        $cartItems = $this->cartRepository->getBySession($sessionId);
+    public function placeOrder(
+        int $userId,
+        ?string $notes = null,
+        string $currencyCode = 'MYR',
+        ?float $currencyRate = null,
+        int $currencyUnit = 1,
+    ): Order {
+        $cartItems = $this->cartRepository->getCart(null, $userId);
 
         if ($cartItems->isEmpty()) {
             throw ValidationException::withMessages([
@@ -64,14 +69,17 @@ class OrderService
         $subtotal = collect($orderItems)->sum('subtotal');
 
         $order = $this->orderRepository->create([
-            'user_id'  => $userId,
-            'status'   => 'pending',
-            'subtotal' => $subtotal,
-            'total'    => $subtotal,
-            'notes'    => $notes,
+            'user_id'       => $userId,
+            'status'        => 'pending',
+            'subtotal'      => $subtotal,
+            'total'         => $subtotal,
+            'notes'         => $notes,
+            'currency_code' => $currencyCode,
+            'currency_rate' => $currencyRate,
+            'currency_unit' => $currencyUnit,
         ], $orderItems);
 
-        $this->cartRepository->clearSession($sessionId);
+        $this->cartRepository->clearCart(null, $userId);
 
         return $order;
     }

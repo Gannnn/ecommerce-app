@@ -1,4 +1,4 @@
-import apiClient from '@/api/client'
+import adminClient from '@/api/adminClient'
 import type { Product, Category, Order, OrderStatus, AdminProductPayload, AdminCategoryPayload } from '@/api/types'
 
 function productToFormData(payload: Partial<AdminProductPayload>): FormData {
@@ -15,11 +15,11 @@ function productToFormData(payload: Partial<AdminProductPayload>): FormData {
 
 export const adminProductsService = {
   getAll(): Promise<Product[]> {
-    return apiClient.get<Product[]>('/admin/products').then((r) => r.data)
+    return adminClient.get<Product[]>('/admin/products').then((r) => r.data)
   },
 
   create(payload: AdminProductPayload): Promise<Product> {
-    return apiClient
+    return adminClient
       .post<Product>('/admin/products', productToFormData(payload), {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
@@ -30,7 +30,7 @@ export const adminProductsService = {
   update(id: number, payload: Partial<AdminProductPayload>): Promise<Product> {
     const fd = productToFormData(payload)
     fd.append('_method', 'PUT')
-    return apiClient
+    return adminClient
       .post<Product>(`/admin/products/${id}`, fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
@@ -38,34 +38,34 @@ export const adminProductsService = {
   },
 
   destroy(id: number): Promise<void> {
-    return apiClient.delete(`/admin/products/${id}`).then(() => undefined)
+    return adminClient.delete(`/admin/products/${id}`).then(() => undefined)
   },
 }
 
 export const adminOrdersService = {
   getAll(): Promise<Order[]> {
-    return apiClient.get<Order[]>('/admin/orders').then((r) => r.data)
+    return adminClient.get<Order[]>('/admin/orders').then((r) => r.data)
   },
 
   updateStatus(id: number, status: OrderStatus): Promise<Order> {
-    return apiClient.patch<Order>(`/admin/orders/${id}/status`, { status }).then((r) => r.data)
+    return adminClient.patch<Order>(`/admin/orders/${id}/status`, { status }).then((r) => r.data)
   },
 }
 
 export const adminCategoriesService = {
   getAll(): Promise<Category[]> {
-    return apiClient.get<Category[]>('/admin/categories').then((r) => r.data)
+    return adminClient.get<Category[]>('/admin/categories').then((r) => r.data)
   },
 
   create(payload: AdminCategoryPayload): Promise<Category> {
-    return apiClient.post<Category>('/admin/categories', payload).then((r) => r.data)
+    return adminClient.post<Category>('/admin/categories', payload).then((r) => r.data)
   },
 
   update(id: number, payload: Partial<AdminCategoryPayload>): Promise<Category> {
-    return apiClient.put<Category>(`/admin/categories/${id}`, payload).then((r) => r.data)
+    return adminClient.put<Category>(`/admin/categories/${id}`, payload).then((r) => r.data)
   },
 
   destroy(id: number): Promise<void> {
-    return apiClient.delete(`/admin/categories/${id}`).then(() => undefined)
+    return adminClient.delete(`/admin/categories/${id}`).then(() => undefined)
   },
 }

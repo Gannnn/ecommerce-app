@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
 import { useOrderStore } from '@/stores/orders'
+import { useCurrencyStore } from '@/stores/currency'
 import { ApiError } from '@/api/client'
 import CartItemRow from '@/components/CartItemRow.vue'
 import AppSpinner from '@/components/AppSpinner.vue'
@@ -11,15 +12,12 @@ import AppSpinner from '@/components/AppSpinner.vue'
 const cart = useCartStore()
 const auth = useAuthStore()
 const orderStore = useOrderStore()
+const currency = useCurrencyStore()
 const router = useRouter()
 
 const placing = ref(false)
 const clearing = ref(false)
 const error = ref('')
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
-}
 
 async function clearCart() {
   clearing.value = true
@@ -102,7 +100,7 @@ async function placeOrder() {
           <div class="summary-rows">
             <div class="summary-row">
               <span>Subtotal ({{ cart.itemCount }} {{ cart.itemCount === 1 ? 'item' : 'items' }})</span>
-              <span>{{ formatPrice(cart.subtotal) }}</span>
+              <span>{{ currency.formatPrice(cart.subtotal) }}</span>
             </div>
             <div class="summary-row">
               <span>Shipping</span>
@@ -114,7 +112,7 @@ async function placeOrder() {
 
           <div class="summary-total">
             <span>Total</span>
-            <span>{{ formatPrice(cart.subtotal) }}</span>
+            <span>{{ currency.formatPrice(cart.subtotal) }}</span>
           </div>
 
           <p v-if="error" class="error-msg">{{ error }}</p>

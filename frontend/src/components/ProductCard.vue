@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Product } from '@/stores/products'
 import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
 
 const props = defineProps<{ product: Product }>()
 const router = useRouter()
@@ -12,6 +13,7 @@ function goToDetail() {
 }
 
 const cart = useCartStore()
+const currency = useCurrencyStore()
 const adding = ref(false)
 const added = ref(false)
 
@@ -25,10 +27,6 @@ async function addToCart() {
   } finally {
     adding.value = false
   }
-}
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
 }
 </script>
 
@@ -50,7 +48,7 @@ function formatPrice(price: number): string {
     <div class="product-info" @click="goToDetail">
       <p class="label-new" :style="{ visibility: product.is_featured ? 'visible' : 'hidden' }">New</p>
       <p class="product-name">{{ product.name }}</p>
-      <p class="product-price">{{ formatPrice(product.price) }}</p>
+      <p class="product-price">{{ currency.formatPrice(product.price) }}</p>
 
       <button
         class="add-btn"

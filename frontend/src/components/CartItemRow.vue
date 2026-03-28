@@ -2,16 +2,14 @@
 import { ref } from 'vue'
 import type { CartItem } from '@/stores/cart'
 import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
 
 const props = defineProps<{ item: CartItem }>()
 
 const cart = useCartStore()
+const currency = useCurrencyStore()
 const updating = ref(false)
 const removing = ref(false)
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
-}
 
 async function changeQty(delta: number) {
   const newQty = props.item.quantity + delta
@@ -44,7 +42,7 @@ async function remove() {
     />
     <div class="cart-details">
       <p class="cart-name">{{ item.product.name }}</p>
-      <p class="cart-unit-price">{{ formatPrice(item.product.price) }} each</p>
+      <p class="cart-unit-price">{{ currency.formatPrice(item.product.price) }} each</p>
     </div>
     <div class="qty-stepper" :class="{ 'is-updating': updating }">
       <template v-if="updating">
@@ -60,7 +58,7 @@ async function remove() {
         >+</button>
       </template>
     </div>
-    <p class="cart-subtotal">{{ formatPrice(item.product.price * item.quantity) }}</p>
+    <p class="cart-subtotal">{{ currency.formatPrice(item.product.price * item.quantity) }}</p>
     <button class="remove-btn" :disabled="removing" title="Remove" @click="remove">
       <span v-if="removing" class="remove-spinner" />
       <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

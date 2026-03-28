@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useOrderStore } from '@/stores/orders'
+import type { Order } from '@/api/types'
 import OrderStatusBadge from '@/components/OrderStatusBadge.vue'
 import AppSpinner from '@/components/AppSpinner.vue'
 
@@ -17,16 +18,24 @@ async function handleLogout() {
   router.push('/')
 }
 
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
+function formatDate(dateStr: string): string {
+  return (
+    new Date(dateStr).toLocaleString('en-MY', {
+      timeZone: 'Asia/Kuala_Lumpur',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }) + ' MYT'
+  )
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+function formatRate(order: Order): string | null {
+  if (order.currency_code === 'MYR' || !order.currency_rate) return null
+  const unit = order.currency_unit ?? 1
+  return `${unit} ${order.currency_code} = RM ${order.currency_rate.toFixed(4)}`
 }
 
 function memberSince(dateStr: string): string {
@@ -40,6 +49,22 @@ function initials(name: string): string {
     .join('')
     .toUpperCase()
     .slice(0, 2)
+}
+
+function formatOrderPrice(myrAmount: number, order: Order): string {
+  const { currency_code: code, currency_rate: rate, currency_unit: unit } = order
+  if (code === 'MYR' || !rate) return `RM ${myrAmount.toFixed(2)}`
+  const converted = (myrAmount * (unit ?? 1)) / rate
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(converted)
+  } catch {
+    return `${code} ${converted.toFixed(2)}`
+  }
 }
 </script>
 
@@ -89,7 +114,11 @@ function initials(name: string): string {
               </div>
               <div class="order-header-right">
                 <OrderStatusBadge :status="order.status" />
-                <span class="order-total">{{ formatPrice(order.total) }}</span>
+                <div class="order-total-group">
+                  <span class="order-total">{{ formatOrderPrice(order.total, order) }}</span>
+                  <span v-if="order.currency_code !== 'MYR'" class="order-total-myr">RM {{ order.total.toFixed(2) }}</span>
+                  <span v-if="formatRate(order)" class="order-rate">{{ formatRate(order) }}</span>
+                </div>
               </div>
             </div>
 
@@ -103,10 +132,10 @@ function initials(name: string): string {
                 />
                 <div class="item-details">
                   <span class="item-name">{{ item.product_name }}</span>
-                  <span class="item-unit">{{ formatPrice(item.product_price) }} each</span>
+                  <span class="item-unit">{{ formatOrderPrice(item.product_price, order) }} each</span>
                 </div>
                 <span class="item-qty">× {{ item.quantity }}</span>
-                <span class="item-price">{{ formatPrice(item.subtotal) }}</span>
+                <span class="item-price">{{ formatOrderPrice(item.subtotal, order) }}</span>
               </div>
             </div>
 
@@ -308,10 +337,28 @@ function initials(name: string): string {
   flex-shrink: 0;
 }
 
+.order-total-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
 .order-total {
   font-size: 0.9375rem;
   font-weight: 600;
   color: #1d1d1f;
+}
+
+.order-total-myr {
+  font-size: 0.75rem;
+  color: #aeaeb2;
+}
+
+.order-rate {
+  font-size: 0.6875rem;
+  color: #aeaeb2;
+  font-variant-numeric: tabular-nums;
 }
 
 .order-items {

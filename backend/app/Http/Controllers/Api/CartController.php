@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -13,8 +14,9 @@ class CartController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $sessionId = $request->header('X-Session-ID', '');
-        $items = $this->cartService->getCart($sessionId);
+        $sessionId = $request->header('X-Session-ID');
+        $userId = Auth::guard('sanctum')->user()?->id;
+        $items = $this->cartService->getCart($sessionId, $userId);
 
         return response()->json($items);
     }
@@ -26,8 +28,8 @@ class CartController extends Controller
             'quantity'   => 'required|integer|min:1',
         ]);
 
-        $sessionId = $request->header('X-Session-ID', '');
-        $userId = $request->user()?->id;
+        $sessionId = $request->header('X-Session-ID');
+        $userId = Auth::guard('sanctum')->user()?->id;
 
         $item = $this->cartService->addItem($sessionId, $data['product_id'], $data['quantity'], $userId);
 
@@ -40,24 +42,27 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $sessionId = $request->header('X-Session-ID', '');
-        $item = $this->cartService->updateItem($sessionId, $id, $data['quantity']);
+        $sessionId = $request->header('X-Session-ID');
+        $userId = Auth::guard('sanctum')->user()?->id;
+        $item = $this->cartService->updateItem($sessionId, $userId, $id, $data['quantity']);
 
         return response()->json($item);
     }
 
     public function destroy(Request $request, int $id): JsonResponse
     {
-        $sessionId = $request->header('X-Session-ID', '');
-        $this->cartService->removeItem($sessionId, $id);
+        $sessionId = $request->header('X-Session-ID');
+        $userId = Auth::guard('sanctum')->user()?->id;
+        $this->cartService->removeItem($sessionId, $userId, $id);
 
         return response()->json(['message' => 'Item removed.']);
     }
 
     public function destroyAll(Request $request): JsonResponse
     {
-        $sessionId = $request->header('X-Session-ID', '');
-        $this->cartService->clearCart($sessionId);
+        $sessionId = $request->header('X-Session-ID');
+        $userId = Auth::guard('sanctum')->user()?->id;
+        $this->cartService->clearCart($sessionId, $userId);
 
         return response()->json(['message' => 'Cart cleared.']);
     }
