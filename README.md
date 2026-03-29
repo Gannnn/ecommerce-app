@@ -11,6 +11,7 @@ A full-stack ecommerce application built with **Laravel** (REST API) and **Vue 3
 - PHP >= 8.2
 - Composer
 - Node.js >= 18 & npm
+- MySQL (or Laragon / XAMPP)
 
 ---
 
@@ -34,13 +35,13 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-The app uses **SQLite** by default — no database server needed. Create the database file:
+Create a MySQL database named `ecommerce-app`, then update `.env` with your credentials if needed (default assumes `root` with no password):
 
-```bash
-touch database/database.sqlite
 ```
-
-> On Windows, create an empty file at `backend/database/database.sqlite` manually.
+DB_DATABASE=ecommerce-app
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
 Run migrations and seed dummy data:
 
