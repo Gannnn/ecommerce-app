@@ -109,7 +109,7 @@ function formatOrderPrice(myrAmount: number, order: Order): string {
 
             <div class="order-header">
               <div class="order-meta">
-                <span class="order-num">Order #{{ order.id }}</span>
+                <span class="order-num">Order #{{ order.order_number }}</span>
                 <span class="order-date">{{ formatDate(order.created_at) }}</span>
               </div>
               <div class="order-header-right">

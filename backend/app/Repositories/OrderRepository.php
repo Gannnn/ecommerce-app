@@ -31,6 +31,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function create(array $data, array $items): Order
     {
         return DB::transaction(function () use ($data, $items) {
+            $data['order_number'] = Order::generateOrderNumber();
             $order = Order::create($data);
 
             foreach ($items as $item) {

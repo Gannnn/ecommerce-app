@@ -96,7 +96,7 @@ async function changeStatus(orderId: number, status: string) {
         </thead>
         <tbody>
           <tr v-for="order in orders" :key="order.id" class="table-row">
-            <td class="td-name">#{{ order.id }}</td>
+            <td class="td-name">#{{ order.order_number }}</td>
             <td class="td-meta">
               <span>{{ order.user?.name ?? '—' }}</span>
               <span class="td-sub">{{ order.user?.email ?? '' }}</span>

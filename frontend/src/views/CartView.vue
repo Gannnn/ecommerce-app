@@ -37,6 +37,7 @@ async function placeOrder() {
   error.value = ''
   try {
     await orderStore.placeOrder()
+    cart.items = []
     router.push('/account')
   } catch (e: unknown) {
     error.value = e instanceof ApiError ? e.message : 'Failed to place order.'
@@ -52,7 +53,7 @@ async function placeOrder() {
     <!-- Hero -->
     <div class="page-hero">
       <div class="hero-inner">
-        <h1 class="hero-title">Your Cart</h1>
+        <h1 class="hero-title">Boostorder Cart</h1>
       </div>
     </div>
 

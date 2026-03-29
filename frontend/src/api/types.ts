@@ -93,6 +93,7 @@ export interface OrderItem {
 
 export interface Order {
   id: number
+  order_number: string
   user_id: number
   user: Pick<User, 'id' | 'name' | 'email'> | null
   status: OrderStatus

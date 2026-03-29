@@ -46,7 +46,7 @@ async function changeStatus(orderId: number, status: string) {
         <div v-for="order in orderStore.orders" :key="order.id" class="order-card">
           <div class="order-header">
             <div>
-              <p class="order-num">Order #{{ order.id }}</p>
+              <p class="order-num">Order #{{ order.order_number }}</p>
               <p class="order-date">{{ formatDate(order.created_at) }}</p>
             </div>
             <div class="order-header-right">
