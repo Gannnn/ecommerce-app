@@ -10,6 +10,7 @@ return [
         'http://127.0.0.1:5173',
         'https://boostorder.ganrongshen.com',
         'https://boostorder-api.ganrongshen.com',
+        'https://boostorder-api.ganrongshen.com/api',
     ],
 
     'allowed_origins_patterns' => [],
