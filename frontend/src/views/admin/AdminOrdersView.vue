@@ -85,6 +85,7 @@ async function changeStatus(orderId: number, status: string) {
         <thead>
           <tr>
             <th>Order</th>
+            <th>Customer</th>
             <th>Date (MYT)</th>
             <th>Items</th>
             <th>Total</th>
@@ -96,6 +97,10 @@ async function changeStatus(orderId: number, status: string) {
         <tbody>
           <tr v-for="order in orders" :key="order.id" class="table-row">
             <td class="td-name">#{{ order.id }}</td>
+            <td class="td-meta">
+              <span>{{ order.user?.name ?? '—' }}</span>
+              <span class="td-sub">{{ order.user?.email ?? '' }}</span>
+            </td>
             <td class="td-meta td-date">{{ formatDate(order.created_at) }}</td>
             <td class="td-meta">{{ order.items.length }}</td>
             <td class="td-meta">

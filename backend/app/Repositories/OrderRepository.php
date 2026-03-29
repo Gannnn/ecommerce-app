@@ -12,7 +12,7 @@ class OrderRepository implements OrderRepositoryInterface
 {
     public function all(): Collection
     {
-        return Order::with('items.product')->latest()->get();
+        return Order::with('items.product', 'user')->latest()->get();
     }
 
     public function forUser(int $userId): Collection

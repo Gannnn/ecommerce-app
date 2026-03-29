@@ -50,12 +50,14 @@ class OrderService
     ): Order {
         $cartItems = $this->cartRepository->getCart(null, $userId);
 
+        // Validates cart is not empty
         if ($cartItems->isEmpty()) {
             throw ValidationException::withMessages([
                 'cart' => 'Your cart is empty.',
             ]);
         }
 
+        // Calculates total
         $orderItems = $cartItems->map(function ($item) {
             return [
                 'product_id'    => $item->product_id,
@@ -68,6 +70,7 @@ class OrderService
 
         $subtotal = collect($orderItems)->sum('subtotal');
 
+        // Creates order via repository
         $order = $this->orderRepository->create([
             'user_id'       => $userId,
             'status'        => 'pending',

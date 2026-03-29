@@ -94,6 +94,7 @@ export interface OrderItem {
 export interface Order {
   id: number
   user_id: number
+  user: Pick<User, 'id' | 'name' | 'email'> | null
   status: OrderStatus
   subtotal: number
   total: number
