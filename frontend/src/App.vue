@@ -39,10 +39,13 @@ onMounted(async () => {
 <style>
 .app {
   min-height: 100vh;
-  background-color: var(--apple-white);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--apple-light);
 }
 
 main {
   padding-top: 44px;
+  flex: 1;
 }
 </style>
