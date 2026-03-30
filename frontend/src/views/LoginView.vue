@@ -63,7 +63,7 @@ async function handleLogin() {
 
 <style scoped>
 .auth-page {
-  min-height: calc(100vh - 52px);
+  min-height: calc(100vh - 44px);
   display: flex;
   align-items: center;
   justify-content: center;

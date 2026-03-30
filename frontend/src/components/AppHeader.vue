@@ -125,6 +125,13 @@ const categories = [
           <span v-if="cart.itemCount > 0" class="cart-badge">{{ cart.itemCount }}</span>
         </RouterLink>
 
+        <!-- Admin -->
+        <RouterLink to="/admin" class="nav-action desktop-only" aria-label="Admin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </RouterLink>
+
         <!-- Account / Sign in -->
         <template v-if="auth.isAuthenticated">
           <RouterLink to="/account" class="nav-action desktop-only" aria-label="Account">
@@ -202,7 +209,12 @@ const categories = [
         Sign In
       </RouterLink>
 
-      <RouterLink v-if="adminAuth.isAuthenticated" to="/admin" class="mobile-item mobile-item-muted" @click="mobileMenuOpen = false">Admin</RouterLink>
+      <RouterLink to="/admin" class="mobile-item mobile-item-icon" @click="mobileMenuOpen = false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Admin
+      </RouterLink>
     </div>
   </Transition>
 </template>
